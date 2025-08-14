@@ -15,7 +15,6 @@
     <groupId>com.pkfare</groupId>
     <artifactId>trip-scale</artifactId>
     <version>1.0.0</version>
-    <description>Java Spring Boot Framework Project</description>
 
     <properties>
         <java.version>21</java.version>

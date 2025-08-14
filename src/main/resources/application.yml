@@ -1,84 +1,79 @@
 server:
-  port: 8080
+  port: 8802
   servlet:
-    context-path: /api
+    context-path: /
 
 spring:
   application:
-    name: spring-boot-framework
+    name: trip-scale
+  ai:
+    mcp:
+      server:
+        enabled: true
+        port: 8803
+        name: "tripscale-mcp-server"
+        description: "TripScale relevant MCP server"
 
-logging:
-  level:
-    com.pkfare.tripscale: INFO
-    org.springframework: WARN
-    org.springframework.web: INFO
-    org.springframework.boot: INFO
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-  file:
-    name: logs/application.log
-
-    # Mock data configuration for MemoryService
-    mock:
-      memory:
-        user-data:
-          recent-focus-destinations:
-            - "Japan"
-            - "Europe"
-            - "Southeast Asia"
-            - "New Zealand"
-          travel-styles:
-            - "Cultural"
-            - "Adventure"
-            - "Relaxation"
-            - "Food & Drink"
-            - "Photography"
-          likes:
-            - "Museums and galleries"
-            - "Local cuisine"
-            - "Nature and hiking"
-            - "Photography"
-            - "Historical sites"
-            - "Local markets"
-            - "Beach activities"
-            - "Mountain views"
-          hates:
-            - "Crowded tourist traps"
-            - "Extreme sports"
-            - "Long flights over 12 hours"
-            - "Very expensive restaurants"
-            - "Rainy weather destinations"
-          age: 28
-      destinations:
-        suggestions:
-          - destination: "Vietnam, Hanoi"
-            reason: "Perfect blend of culture and cuisine with affordable prices"
-            confidence: 0.85
-          - destination: "Japan, Kyoto"
-            reason: "Rich cultural heritage and beautiful temples"
-            confidence: 0.92
-          - destination: "Thailand, Chiang Mai"
-            reason: "Authentic local experiences and great food scene"
-            confidence: 0.78
-          - destination: "Portugal, Porto"
-            reason: "Charming architecture and excellent wine culture"
-            confidence: 0.81
-          - destination: "South Korea, Busan"
-            reason: "Coastal beauty with modern city amenities"
-            confidence: 0.76
-          - destination: "Taiwan, Taipei"
-            reason: "Night markets and incredible street food"
-            confidence: 0.83
-          - destination: "Greece, Santorini"
-            reason: "Stunning sunsets and Mediterranean charm"
-            confidence: 0.89
-          - destination: "Morocco, Marrakech"
-            reason: "Exotic culture and vibrant markets"
-            confidence: 0.74
-          - destination: "Nepal, Kathmandu"
-            reason: "Gateway to Himalayas with rich spiritual culture"
-            confidence: 0.72
-          - destination: "Peru, Cusco"
-            reason: "Ancient Incan history and gateway to Machu Picchu"
-            confidence: 0.87
+# Mock data configuration for MemoryService
+mock:
+  memory:
+    user-data:
+      recent-focus-destinations:
+        - "Japan"
+        - "Europe"
+        - "Southeast Asia"
+        - "New Zealand"
+      travel-styles:
+        - "Cultural"
+        - "Adventure"
+        - "Relaxation"
+        - "Food & Drink"
+        - "Photography"
+      likes:
+        - "Museums and galleries"
+        - "Local cuisine"
+        - "Nature and hiking"
+        - "Photography"
+        - "Historical sites"
+        - "Local markets"
+        - "Beach activities"
+        - "Mountain views"
+      hates:
+        - "Crowded tourist traps"
+        - "Extreme sports"
+        - "Long flights over 12 hours"
+        - "Very expensive restaurants"
+        - "Rainy weather destinations"
+      age: 28
+  destinations:
+    suggestions:
+      - destination: "Vietnam, Hanoi"
+        reason: "Perfect blend of culture and cuisine with affordable prices"
+        confidence: 0.85
+      - destination: "Japan, Kyoto"
+        reason: "Rich cultural heritage and beautiful temples"
+        confidence: 0.92
+      - destination: "Thailand, Chiang Mai"
+        reason: "Authentic local experiences and great food scene"
+        confidence: 0.78
+      - destination: "Portugal, Porto"
+        reason: "Charming architecture and excellent wine culture"
+        confidence: 0.81
+      - destination: "South Korea, Busan"
+        reason: "Coastal beauty with modern city amenities"
+        confidence: 0.76
+      - destination: "Taiwan, Taipei"
+        reason: "Night markets and incredible street food"
+        confidence: 0.83
+      - destination: "Greece, Santorini"
+        reason: "Stunning sunsets and Mediterranean charm"
+        confidence: 0.89
+      - destination: "Morocco, Marrakech"
+        reason: "Exotic culture and vibrant markets"
+        confidence: 0.74
+      - destination: "Nepal, Kathmandu"
+        reason: "Gateway to Himalayas with rich spiritual culture"
+        confidence: 0.72
+      - destination: "Peru, Cusco"
+        reason: "Ancient Incan history and gateway to Machu Picchu"
+        confidence: 0.87

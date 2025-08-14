@@ -11,7 +11,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
  * This class serves as the entry point for the Spring Boot application.
  */
 @EnableConfigurationProperties
-@SpringBootApplication(scanBasePackages = {"com.pkfare.*"}, exclude = {MongoDataAutoConfiguration.class, MongoAutoConfiguration.class})
+@SpringBootApplication(scanBasePackages = {"com.pkfare.*"})
 public class Application {
 
     /**
