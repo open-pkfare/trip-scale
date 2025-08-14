@@ -2,6 +2,7 @@ package com.pkfare.tripscale.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -17,11 +18,11 @@ import java.util.UUID;
  * Interceptor for logging HTTP requests and responses for audit trails.
  * Captures request/response details while being mindful of sensitive data.
  */
+@Slf4j
 @Component
 public class LoggingInterceptor implements HandlerInterceptor {
     
     private static final Logger auditLogger = LoggerFactory.getLogger("AUDIT");
-    private static final Logger logger = LoggerFactory.getLogger(LoggingInterceptor.class);
     
     private static final String REQUEST_ID_HEADER = "X-Request-ID";
     private static final String REQUEST_ID_MDC_KEY = "requestId";
@@ -105,7 +106,7 @@ public class LoggingInterceptor implements HandlerInterceptor {
             auditLogger.info(logMessage.toString());
             
         } catch (Exception e) {
-            logger.warn("Failed to log request details", e);
+            log.warn("Failed to log request details", e);
         }
     }
     
@@ -147,7 +148,7 @@ public class LoggingInterceptor implements HandlerInterceptor {
             }
             
         } catch (Exception e) {
-            logger.warn("Failed to log response details", e);
+            log.warn("Failed to log response details", e);
         }
     }
     

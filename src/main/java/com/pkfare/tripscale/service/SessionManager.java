@@ -3,6 +3,7 @@ package com.pkfare.tripscale.service;
 import com.pkfare.tripscale.model.PersonalPreferences;
 import com.pkfare.tripscale.model.TravelDemand;
 import com.pkfare.tripscale.model.TripRoute;
+import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -10,6 +11,7 @@ import java.util.Objects;
 /**
  * Session data holder for multi-step travel interactions
  */
+@Slf4j
 public class SessionManager {
     
     /**
@@ -32,10 +34,12 @@ public class SessionManager {
             this.createdAt = LocalDateTime.now();
             this.lastAccessedAt = LocalDateTime.now();
             this.status = SessionStatus.INITIATED;
+            log.debug("Created new session: {} for user: {}", sessionId, userId);
         }
         
         public void updateLastAccessed() {
             this.lastAccessedAt = LocalDateTime.now();
+            log.debug("Updated last accessed time for session: {}", this.sessionId);
         }
         
         // Getters and setters
@@ -64,7 +68,11 @@ public class SessionManager {
         public void setTripRoutes(List<TripRoute> tripRoutes) { this.tripRoutes = tripRoutes; }
         
         public SessionStatus getStatus() { return status; }
-        public void setStatus(SessionStatus status) { this.status = status; }
+        public void setStatus(SessionStatus status) { 
+            SessionStatus oldStatus = this.status;
+            this.status = status; 
+            log.debug("Session {} status changed from {} to {}", this.sessionId, oldStatus, status);
+        }
         
         @Override
         public boolean equals(Object o) {
@@ -98,7 +106,9 @@ public class SessionManager {
      * @return Unique session identifier
      */
     public static String generateSessionId() {
-        return "session_" + System.currentTimeMillis() + "_" + 
+        String sessionId = "session_" + System.currentTimeMillis() + "_" + 
                (int)(Math.random() * 10000);
+        log.debug("Generated new session ID: {}", sessionId);
+        return sessionId;
     }
 }

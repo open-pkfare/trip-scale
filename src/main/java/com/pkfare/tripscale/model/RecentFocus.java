@@ -1,13 +1,14 @@
 package com.pkfare.tripscale.model;
 
+import lombok.Data;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.util.Objects;
 
 /**
  * Model representing recent focus destination with priority
  */
+@Data
 public class RecentFocus {
     
     @NotNull(message = "Priority is required")
@@ -24,41 +25,5 @@ public class RecentFocus {
         this.destination = destination;
     }
     
-    public Integer getPriority() {
-        return priority;
-    }
-    
-    public void setPriority(Integer priority) {
-        this.priority = priority;
-    }
-    
-    public String getDestination() {
-        return destination;
-    }
-    
-    public void setDestination(String destination) {
-        this.destination = destination;
-    }
-    
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        RecentFocus that = (RecentFocus) o;
-        return Objects.equals(priority, that.priority) &&
-               Objects.equals(destination, that.destination);
-    }
-    
-    @Override
-    public int hashCode() {
-        return Objects.hash(priority, destination);
-    }
-    
-    @Override
-    public String toString() {
-        return "RecentFocus{" +
-               "priority=" + priority +
-               ", destination='" + destination + '\'' +
-               '}';
-    }
+
 }

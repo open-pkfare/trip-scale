@@ -1,5 +1,6 @@
 package com.pkfare.tripscale.util;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -10,6 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Rate limiter for external service calls to prevent abuse and ensure
  * fair usage of external APIs.
  */
+@Slf4j
 @Component
 public class RateLimiter {
     
@@ -32,6 +34,8 @@ public class RateLimiter {
         String key = service + ":" + userId;
         int maxRequests = getMaxRequestsForService(service);
         
+        log.debug("Checking rate limit for service: {}, user: {}, max requests: {}", service, userId, maxRequests);
+        
         RateLimitInfo info = rateLimits.computeIfAbsent(key, k -> new RateLimitInfo());
         
         synchronized (info) {
@@ -40,16 +44,24 @@ public class RateLimiter {
             // Reset counter if a minute has passed
             if (info.windowStart == null || 
                 ChronoUnit.MINUTES.between(info.windowStart, now) >= 1) {
+                if (info.windowStart != null) {
+                    log.debug("Rate limit window reset for service: {}, user: {}", service, userId);
+                }
                 info.windowStart = now;
                 info.requestCount.set(0);
             }
             
             // Check if under limit
             if (info.requestCount.get() < maxRequests) {
-                info.requestCount.incrementAndGet();
+                int currentCount = info.requestCount.incrementAndGet();
+                log.debug("Request allowed for service: {}, user: {}, current count: {}/{}", 
+                         service, userId, currentCount, maxRequests);
                 return true;
             }
             
+            // Rate limit exceeded - log warning
+            log.warn("Rate limit exceeded for service: {}, user: {}, requests: {}/{}, window started: {}", 
+                    service, userId, info.requestCount.get(), maxRequests, info.windowStart);
             return false;
         }
     }
@@ -65,8 +77,12 @@ public class RateLimiter {
         String key = service + ":" + userId;
         int maxRequests = getMaxRequestsForService(service);
         
+        log.debug("Getting remaining requests for service: {}, user: {}", service, userId);
+        
         RateLimitInfo info = rateLimits.get(key);
         if (info == null) {
+            log.debug("No rate limit info found for service: {}, user: {}, returning max: {}", 
+                     service, userId, maxRequests);
             return maxRequests;
         }
         
@@ -76,10 +92,15 @@ public class RateLimiter {
             // Reset if window expired
             if (info.windowStart == null || 
                 ChronoUnit.MINUTES.between(info.windowStart, now) >= 1) {
+                log.debug("Rate limit window expired for service: {}, user: {}, returning max: {}", 
+                         service, userId, maxRequests);
                 return maxRequests;
             }
             
-            return Math.max(0, maxRequests - info.requestCount.get());
+            int remaining = Math.max(0, maxRequests - info.requestCount.get());
+            log.debug("Remaining requests for service: {}, user: {}: {}/{}", 
+                     service, userId, remaining, maxRequests);
+            return remaining;
         }
     }
     
@@ -94,7 +115,10 @@ public class RateLimiter {
         String key = service + ":" + userId;
         RateLimitInfo info = rateLimits.get(key);
         
+        log.debug("Getting seconds until reset for service: {}, user: {}", service, userId);
+        
         if (info == null || info.windowStart == null) {
+            log.debug("No rate limit info or window start for service: {}, user: {}, returning 0", service, userId);
             return 0;
         }
         
@@ -103,20 +127,29 @@ public class RateLimiter {
             LocalDateTime resetTime = info.windowStart.plusMinutes(1);
             
             if (now.isAfter(resetTime)) {
+                log.debug("Rate limit window already expired for service: {}, user: {}, returning 0", service, userId);
                 return 0;
             }
             
-            return ChronoUnit.SECONDS.between(now, resetTime);
+            long secondsUntilReset = ChronoUnit.SECONDS.between(now, resetTime);
+            log.debug("Seconds until reset for service: {}, user: {}: {}", service, userId, secondsUntilReset);
+            return secondsUntilReset;
         }
     }
     
     private int getMaxRequestsForService(String service) {
-        return switch (service.toLowerCase()) {
+        int maxRequests = switch (service.toLowerCase()) {
             case "dify" -> DIFY_REQUESTS_PER_MINUTE;
             case "memory" -> MEMORY_REQUESTS_PER_MINUTE;
             case "trip-knowledge" -> TRIP_KNOWLEDGE_REQUESTS_PER_MINUTE;
-            default -> 10; // Default conservative limit
+            default -> {
+                log.warn("Unknown service '{}' requested, using default rate limit of 10 requests per minute", service);
+                yield 10; // Default conservative limit
+            }
         };
+        
+        log.debug("Rate limit configuration for service '{}': {} requests per minute", service, maxRequests);
+        return maxRequests;
     }
     
     /**

@@ -10,8 +10,7 @@ import com.pkfare.tripscale.model.Inspirations;
 import com.pkfare.tripscale.model.LastVisit;
 import com.pkfare.tripscale.model.RecentFocus;
 import com.pkfare.tripscale.service.DifyService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -26,10 +25,9 @@ import java.util.stream.Collectors;
 /**
  * Implementation of DifyService for integrating with Dify AI API
  */
+@Slf4j
 @Service
 public class DifyServiceImpl implements DifyService {
-    
-    private static final Logger logger = LoggerFactory.getLogger(DifyServiceImpl.class);
     
     private final RestTemplate restTemplate;
     private final DifyServiceConfig config;
@@ -44,7 +42,7 @@ public class DifyServiceImpl implements DifyService {
     
     @Override
     public GuessMeResponse guessDestination(Inspirations inspirations) {
-        logger.info("Calling Dify API to guess destination based on inspirations");
+        log.info("Calling Dify API to guess destination based on inspirations");
         
         if (inspirations == null) {
             throw new BusinessException("Inspirations data is required", "INVALID_INPUT");
@@ -60,16 +58,16 @@ public class DifyServiceImpl implements DifyService {
             // Process and transform response
             GuessMeResponse response = processDifyResponse(difyResponse);
             
-            logger.info("Successfully processed Dify API response with {} suggestions", 
+            log.info("Successfully processed Dify API response with {} suggestions", 
                        response.getSuggestions().size());
             
             return response;
             
         } catch (BusinessException e) {
-            logger.error("Business error in Dify service: {}", e.getMessage());
+            log.error("Business error in Dify service: {}", e.getMessage());
             throw e;
         } catch (Exception e) {
-            logger.error("Unexpected error calling Dify API", e);
+            log.error("Unexpected error calling Dify API", e);
             throw new BusinessException("Failed to get destination suggestions from AI service", 
                                       "DIFY_SERVICE_ERROR", e);
         }
@@ -77,6 +75,7 @@ public class DifyServiceImpl implements DifyService {
     
     @Override
     public boolean isServiceHealthy() {
+        log.debug("Checking Dify service health");
         try {
             String healthUrl = config.getBaseUrl() + "/health";
             HttpHeaders headers = createHeaders();
@@ -85,10 +84,12 @@ public class DifyServiceImpl implements DifyService {
             ResponseEntity<String> response = restTemplate.exchange(
                 healthUrl, HttpMethod.GET, entity, String.class);
             
-            return response.getStatusCode().is2xxSuccessful();
+            boolean isHealthy = response.getStatusCode().is2xxSuccessful();
+            log.debug("Dify service health check result: {}", isHealthy);
+            return isHealthy;
             
         } catch (Exception e) {
-            logger.warn("Dify service health check failed", e);
+            log.warn("Dify service health check failed", e);
             return false;
         }
     }
@@ -97,6 +98,7 @@ public class DifyServiceImpl implements DifyService {
      * Build the request payload for Dify API
      */
     private Map<String, Object> buildDifyRequestPayload(Inspirations inspirations) {
+        log.debug("Building Dify API request payload for inspirations");
         Map<String, Object> payload = new HashMap<>();
         
         // Add user context
@@ -146,6 +148,7 @@ public class DifyServiceImpl implements DifyService {
      */
     private JsonNode callDifyApiWithRetry(Map<String, Object> requestPayload) {
         String apiUrl = config.getBaseUrl() + "/api/v1/chat-messages";
+        log.debug("Calling Dify API at: {}", apiUrl);
         HttpHeaders headers = createHeaders();
         
         int attempts = 0;
@@ -161,14 +164,16 @@ public class DifyServiceImpl implements DifyService {
                     apiUrl, HttpMethod.POST, entity, String.class);
                 
                 if (response.getStatusCode().is2xxSuccessful()) {
+                    log.debug("Dify API call successful on attempt {}", attempts);
                     return objectMapper.readTree(response.getBody());
                 } else {
+                    log.error("Dify API returned non-success status: {}", response.getStatusCode());
                     throw new BusinessException("Dify API returned non-success status: " + 
                                               response.getStatusCode(), "DIFY_API_ERROR");
                 }
                 
             } catch (HttpClientErrorException e) {
-                logger.warn("Dify API client error (attempt {}): {}", attempts, e.getMessage());
+                log.warn("Dify API client error (attempt {}): {}", attempts, e.getMessage());
                 if (e.getStatusCode() == HttpStatus.BAD_REQUEST || 
                     e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
                     // Don't retry for client errors
@@ -178,15 +183,15 @@ public class DifyServiceImpl implements DifyService {
                 lastException = e;
                 
             } catch (HttpServerErrorException e) {
-                logger.warn("Dify API server error (attempt {}): {}", attempts, e.getMessage());
+                log.warn("Dify API server error (attempt {}): {}", attempts, e.getMessage());
                 lastException = e;
                 
             } catch (ResourceAccessException e) {
-                logger.warn("Dify API connection error (attempt {}): {}", attempts, e.getMessage());
+                log.warn("Dify API connection error (attempt {}): {}", attempts, e.getMessage());
                 lastException = e;
                 
             } catch (Exception e) {
-                logger.warn("Unexpected error calling Dify API (attempt {}): {}", attempts, e.getMessage());
+                log.warn("Unexpected error calling Dify API (attempt {}): {}", attempts, e.getMessage());
                 lastException = e;
             }
             
@@ -232,7 +237,7 @@ public class DifyServiceImpl implements DifyService {
             return response;
             
         } catch (Exception e) {
-            logger.error("Error processing Dify API response", e);
+            log.error("Error processing Dify API response", e);
             throw new BusinessException("Failed to process AI response", "DIFY_RESPONSE_PROCESSING_ERROR", e);
         }
     }
@@ -268,7 +273,7 @@ public class DifyServiceImpl implements DifyService {
             }
             
         } catch (Exception e) {
-            logger.warn("Error extracting suggestions from Dify response, using fallback", e);
+            log.warn("Error extracting suggestions from Dify response, using fallback", e);
             suggestions = createFallbackSuggestions();
         }
         
@@ -299,7 +304,7 @@ public class DifyServiceImpl implements DifyService {
             return suggestion.getDestination() != null ? suggestion : null;
             
         } catch (Exception e) {
-            logger.warn("Error parsing suggestion node", e);
+            log.warn("Error parsing suggestion node", e);
             return null;
         }
     }

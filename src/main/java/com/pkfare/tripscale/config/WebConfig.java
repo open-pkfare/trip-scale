@@ -1,6 +1,7 @@
 package com.pkfare.tripscale.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.filter.CommonsRequestLoggingFilter;
@@ -12,15 +13,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * Web configuration class for Spring Boot framework.
  * Configures CORS settings, logging interceptors, and other web-specific configurations.
  */
+@Slf4j
 @Configuration
+@RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 
     private final LoggingInterceptor loggingInterceptor;
-
-    @Autowired
-    public WebConfig(LoggingInterceptor loggingInterceptor) {
-        this.loggingInterceptor = loggingInterceptor;
-    }
 
     /**
      * Configure CORS settings for cross-origin requests.
@@ -28,6 +26,7 @@ public class WebConfig implements WebMvcConfigurer {
      */
     @Override
     public void addCorsMappings(CorsRegistry registry) {
+        log.info("Configuring CORS mappings for /api/** endpoints");
         registry.addMapping("/api/**")
                 .allowedOrigins("http://localhost:3000", "http://localhost:8080", "http://localhost:4200")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
@@ -41,6 +40,7 @@ public class WebConfig implements WebMvcConfigurer {
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        log.info("Registering logging interceptor for /api/** paths");
         registry.addInterceptor(loggingInterceptor)
                 .addPathPatterns("/api/**");
     }
@@ -50,6 +50,7 @@ public class WebConfig implements WebMvcConfigurer {
      */
     @Bean
     public CommonsRequestLoggingFilter requestLoggingFilter() {
+        log.info("Configuring request logging filter with payload logging enabled");
         CommonsRequestLoggingFilter filter = new CommonsRequestLoggingFilter();
         filter.setIncludeQueryString(true);
         filter.setIncludePayload(true);

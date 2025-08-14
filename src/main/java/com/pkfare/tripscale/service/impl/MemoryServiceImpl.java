@@ -6,8 +6,7 @@ import com.pkfare.tripscale.exception.UserNotFoundException;
 import com.pkfare.tripscale.exception.ValidationException;
 import com.pkfare.tripscale.model.*;
 import com.pkfare.tripscale.service.MemoryService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.Arrays;
@@ -18,17 +17,16 @@ import java.util.stream.IntStream;
  * Simple implementation of MemoryService with configurable mock data
  * for API development and testing purposes.
  */
+@Slf4j
 @Service
 public class MemoryServiceImpl implements MemoryService {
-    
-    private static final Logger logger = LoggerFactory.getLogger(MemoryServiceImpl.class);
     
     @Autowired
     private MockDataConfig mockDataConfig;
     
     @Override
     public Inspirations getInspirations(String userId) {
-        logger.info("Retrieving inspirations for user: {}", userId);
+        log.info("Retrieving inspirations for user: {}", userId);
         
         if (userId == null || userId.trim().isEmpty()) {
             throw new ValidationException("User ID cannot be null or empty");
@@ -41,6 +39,7 @@ public class MemoryServiceImpl implements MemoryService {
             }
             
             // Return configurable mock inspirations data
+            log.debug("Creating mock inspirations data for user: {}", userId);
             Inspirations inspirations = new Inspirations();
         
         // Create recent focus data from configuration
@@ -75,21 +74,21 @@ public class MemoryServiceImpl implements MemoryService {
             inspirations.setTravelStyle(mockDataConfig.getUserData().getTravelStyles());
             inspirations.setAge(mockDataConfig.getUserData().getAge());
             
-            logger.debug("Successfully retrieved inspirations for user: {}", userId);
+            log.debug("Successfully retrieved inspirations for user: {}", userId);
             return inspirations;
             
         } catch (UserNotFoundException e) {
-            logger.warn("User not found: {}", userId);
+            log.warn("User not found: {}", userId);
             throw e;
         } catch (Exception e) {
-            logger.error("Error retrieving inspirations for user: {}", userId, e);
+            log.error("Error retrieving inspirations for user: {}", userId, e);
             throw new ExternalServiceException("MemoryService", "Failed to retrieve user inspirations", e);
         }
     }
     
     @Override
     public PersonalPreferences getPersonalPreferences(String userId) {
-        logger.info("Retrieving personal preferences for user: {}", userId);
+        log.info("Retrieving personal preferences for user: {}", userId);
         
         if (userId == null || userId.trim().isEmpty()) {
             throw new ValidationException("User ID cannot be null or empty");
@@ -102,25 +101,28 @@ public class MemoryServiceImpl implements MemoryService {
             }
             
             // Return configurable personal preferences
+            log.debug("Creating mock personal preferences for user: {}", userId);
             PersonalPreferences preferences = new PersonalPreferences();
             preferences.setLikes(mockDataConfig.getUserData().getLikes());
             preferences.setHates(mockDataConfig.getUserData().getHates());
+            log.debug("Personal preferences - Likes: {}, Hates: {}", 
+                     preferences.getLikes().size(), preferences.getHates().size());
             
-            logger.debug("Successfully retrieved personal preferences for user: {}", userId);
+            log.debug("Successfully retrieved personal preferences for user: {}", userId);
             return preferences;
             
         } catch (UserNotFoundException e) {
-            logger.warn("User not found: {}", userId);
+            log.warn("User not found: {}", userId);
             throw e;
         } catch (Exception e) {
-            logger.error("Error retrieving personal preferences for user: {}", userId, e);
+            log.error("Error retrieving personal preferences for user: {}", userId, e);
             throw new ExternalServiceException("MemoryService", "Failed to retrieve user preferences", e);
         }
     }
     
     @Override
     public void updateUserHistory(String userId, TravelDemand travelDemand) {
-        logger.info("Updating user history for user: {}", userId);
+        log.info("Updating user history for user: {}", userId);
         
         if (userId == null || userId.trim().isEmpty()) {
             throw new ValidationException("User ID cannot be null or empty");
@@ -137,29 +139,30 @@ public class MemoryServiceImpl implements MemoryService {
             }
             
             // Mock implementation - just log that we received the update
-            logger.debug("Mock MemoryService: Received travel demand update for user {}", userId);
-            logger.debug("Must-go destinations: {}", travelDemand.getMustGoDestinations());
-            logger.debug("Days: {}", travelDemand.getDays());
-            logger.debug("Passengers: {}", travelDemand.getPassenger());
-            logger.debug("Budget: {}", travelDemand.getBudgets());
+            log.debug("Mock MemoryService: Received travel demand update for user {}", userId);
+            log.debug("Must-go destinations: {}", travelDemand.getMustGoDestinations());
+            log.debug("Days: {}", travelDemand.getDays());
+            log.debug("Passengers: {}", travelDemand.getPassenger());
+            log.debug("Budget: {}", travelDemand.getBudgets());
             
             // In a real implementation, this would persist to storage
-            logger.info("Successfully updated user history for user: {}", userId);
+            log.info("Successfully updated user history for user: {}", userId);
             
         } catch (UserNotFoundException e) {
-            logger.warn("User not found during history update: {}", userId);
+            log.warn("User not found during history update: {}", userId);
             throw e;
         } catch (ValidationException e) {
-            logger.warn("Validation error during history update: {}", e.getMessage());
+            log.warn("Validation error during history update: {}", e.getMessage());
             throw e;
         } catch (Exception e) {
-            logger.error("Error updating user history for user: {}", userId, e);
+            log.error("Error updating user history for user: {}", userId, e);
             throw new ExternalServiceException("MemoryService", "Failed to update user history", e);
         }
     }
     
     @Override
     public boolean isServiceHealthy() {
+        log.debug("Checking MemoryService health - mock implementation always returns true");
         // Always return true for mock implementation
         return true;
     }

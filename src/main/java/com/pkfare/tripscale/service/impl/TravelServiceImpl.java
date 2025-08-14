@@ -25,8 +25,7 @@ import com.pkfare.tripscale.service.TripKnowledgeService;
 import com.pkfare.tripscale.util.InputSanitizer;
 import com.pkfare.tripscale.util.RateLimiter;
 import com.pkfare.tripscale.exception.RateLimitExceededException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,10 +35,9 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Implementation of TravelService for orchestrating travel route determination workflows
  */
+@Slf4j
 @Service
 public class TravelServiceImpl implements TravelService {
-    
-    private static final Logger logger = LoggerFactory.getLogger(TravelServiceImpl.class);
     
     private final DifyService difyService;
     private final MemoryService memoryService;
@@ -65,7 +63,7 @@ public class TravelServiceImpl implements TravelService {
     
     @Override
     public TripRoutesResponse processDirectInput(TravelDemandRequest request) {
-        logger.info("Processing direct input for user: {}", request.getUserId());
+        log.info("Processing direct input for user: {}", request.getUserId());
         
         try {
             // Sanitize input data
@@ -95,28 +93,28 @@ public class TravelServiceImpl implements TravelService {
             sessionData.setStatus(SessionManager.SessionStatus.ROUTES_FOUND);
             sessionStore.put(sessionId, sessionData);
             
-            logger.info("Found {} routes for direct input request", routes.size());
+            log.info("Found {} routes for direct input request", routes.size());
             
             return new TripRoutesResponse(sessionId, routes, personalPreferences, "success");
             
         } catch (UserNotFoundException e) {
-            logger.error("User not found for direct input: {}", request.getUserId(), e);
+            log.error("User not found for direct input: {}", request.getUserId(), e);
             throw e;
         } catch (ExternalServiceException e) {
-            logger.error("External service error during direct input: {}", e.getMessage(), e);
+            log.error("External service error during direct input: {}", e.getMessage(), e);
             throw e;
         } catch (ValidationException e) {
-            logger.warn("Validation error during direct input: {}", e.getMessage());
+            log.warn("Validation error during direct input: {}", e.getMessage());
             throw e;
         } catch (Exception e) {
-            logger.error("Unexpected error processing direct input for user: {}", request.getUserId(), e);
+            log.error("Unexpected error processing direct input for user: {}", request.getUserId(), e);
             throw new TravelServiceException("Failed to process direct travel input", e);
         }
     }
     
     @Override
     public GuessMeResponse initiateGuessMe(GuessMeRequest request) {
-        logger.info("Initiating GuessMe for user: {}", request.getUserId());
+        log.info("Initiating GuessMe for user: {}", request.getUserId());
         
         try {
             // Sanitize input data
@@ -140,29 +138,29 @@ public class TravelServiceImpl implements TravelService {
             // Update response with session ID
             aiResponse.setSessionId(sessionId);
             
-            logger.info("Generated {} destination suggestions for user: {}", 
+            log.info("Generated {} destination suggestions for user: {}", 
                        aiResponse.getSuggestions().size(), request.getUserId());
             
             return aiResponse;
             
         } catch (UserNotFoundException e) {
-            logger.error("User not found for GuessMe: {}", request.getUserId(), e);
+            log.error("User not found for GuessMe: {}", request.getUserId(), e);
             throw e;
         } catch (ExternalServiceException e) {
-            logger.error("External service error during GuessMe: {}", e.getMessage(), e);
+            log.error("External service error during GuessMe: {}", e.getMessage(), e);
             throw e;
         } catch (ValidationException e) {
-            logger.warn("Validation error during GuessMe: {}", e.getMessage());
+            log.warn("Validation error during GuessMe: {}", e.getMessage());
             throw e;
         } catch (Exception e) {
-            logger.error("Unexpected error initiating GuessMe for user: {}", request.getUserId(), e);
+            log.error("Unexpected error initiating GuessMe for user: {}", request.getUserId(), e);
             throw new TravelServiceException("Failed to initiate GuessMe process", e);
         }
     }
     
     @Override
     public String confirmDestination(DestinationConfirmationRequest request) {
-        logger.info("Confirming destination for session: {}", request.getSessionId());
+        log.info("Confirming destination for session: {}", request.getSessionId());
         
         // Sanitize input data
         sanitizeDestinationConfirmationRequest(request);
@@ -178,7 +176,7 @@ public class TravelServiceImpl implements TravelService {
         sessionData.setStatus(SessionManager.SessionStatus.DESTINATION_CONFIRMED);
         sessionData.updateLastAccessed();
         
-        logger.info("Destination confirmed: {} for session: {}", 
+        log.info("Destination confirmed: {} for session: {}", 
                    request.getDestination(), request.getSessionId());
         
         return request.getSessionId();
@@ -186,7 +184,7 @@ public class TravelServiceImpl implements TravelService {
     
     @Override
     public TripRoutesResponse collectTravelDetails(TravelDetailsRequest request) {
-        logger.info("Collecting travel details for session: {}", request.getSessionId());
+        log.info("Collecting travel details for session: {}", request.getSessionId());
         
         // Sanitize input data
         sanitizeTravelDetailsRequest(request);
@@ -223,25 +221,25 @@ public class TravelServiceImpl implements TravelService {
             sessionData.setStatus(SessionManager.SessionStatus.ROUTES_FOUND);
             sessionData.updateLastAccessed();
             
-            logger.info("Found {} routes for GuessMe session: {}", routes.size(), request.getSessionId());
+            log.info("Found {} routes for GuessMe session: {}", routes.size(), request.getSessionId());
             
             return new TripRoutesResponse(request.getSessionId(), routes, personalPreferences, "success");
             
         } catch (ExternalServiceException e) {
-            logger.error("External service error during travel details collection: {}", e.getMessage(), e);
+            log.error("External service error during travel details collection: {}", e.getMessage(), e);
             throw e;
         } catch (ValidationException e) {
-            logger.warn("Validation error during travel details collection: {}", e.getMessage());
+            log.warn("Validation error during travel details collection: {}", e.getMessage());
             throw e;
         } catch (Exception e) {
-            logger.error("Unexpected error collecting travel details for session: {}", request.getSessionId(), e);
+            log.error("Unexpected error collecting travel details for session: {}", request.getSessionId(), e);
             throw new TravelServiceException("Failed to collect travel details", e);
         }
     }
     
     @Override
     public TripRoutesResponse getTripRoutes(String sessionId) {
-        logger.info("Retrieving trip routes for session: {}", sessionId);
+        log.info("Retrieving trip routes for session: {}", sessionId);
         
         // Sanitize session ID
         String sanitizedSessionId = inputSanitizer.sanitizeSessionId(sessionId);
@@ -296,6 +294,7 @@ public class TravelServiceImpl implements TravelService {
      * Sanitize TravelDemandRequest input
      */
     private void sanitizeTravelDemandRequest(TravelDemandRequest request) {
+        log.debug("Sanitizing travel demand request for user: {}", request.getUserId());
         try {
             // Sanitize user ID
             request.setUserId(inputSanitizer.sanitizeUserId(request.getUserId()));
@@ -306,6 +305,7 @@ public class TravelServiceImpl implements TravelService {
             }
             
         } catch (IllegalArgumentException e) {
+            log.warn("Input sanitization failed: {}", e.getMessage());
             throw new ValidationException("Invalid input data: " + e.getMessage());
         }
     }
@@ -356,22 +356,29 @@ public class TravelServiceImpl implements TravelService {
      * Check rate limits for external service calls
      */
     private void checkRateLimits(String userId) {
+        log.debug("Checking rate limits for user: {}", userId);
+        
         // Check Memory service rate limit
         if (!rateLimiter.isRequestAllowed("memory", userId)) {
             long retryAfter = rateLimiter.getSecondsUntilReset("memory", userId);
+            log.warn("Memory service rate limit exceeded for user: {}, retry after: {} seconds", userId, retryAfter);
             throw new RateLimitExceededException("memory", userId, retryAfter);
         }
         
         // Check Dify service rate limit
         if (!rateLimiter.isRequestAllowed("dify", userId)) {
             long retryAfter = rateLimiter.getSecondsUntilReset("dify", userId);
+            log.warn("Dify service rate limit exceeded for user: {}, retry after: {} seconds", userId, retryAfter);
             throw new RateLimitExceededException("dify", userId, retryAfter);
         }
         
         // Check Trip Knowledge service rate limit
         if (!rateLimiter.isRequestAllowed("trip-knowledge", userId)) {
             long retryAfter = rateLimiter.getSecondsUntilReset("trip-knowledge", userId);
+            log.warn("Trip Knowledge service rate limit exceeded for user: {}, retry after: {} seconds", userId, retryAfter);
             throw new RateLimitExceededException("trip-knowledge", userId, retryAfter);
         }
+        
+        log.debug("Rate limit checks passed for user: {}", userId);
     }
 }

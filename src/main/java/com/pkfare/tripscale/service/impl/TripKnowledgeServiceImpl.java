@@ -8,8 +8,7 @@ import com.pkfare.tripscale.model.PersonalPreferences;
 import com.pkfare.tripscale.model.TravelDemand;
 import com.pkfare.tripscale.model.TripRoute;
 import com.pkfare.tripscale.service.TripKnowledgeService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,10 +20,9 @@ import java.util.stream.Collectors;
 /**
  * Mock implementation of TripKnowledgeService for development and testing purposes
  */
+@Slf4j
 @Service
 public class TripKnowledgeServiceImpl implements TripKnowledgeService {
-    
-    private static final Logger logger = LoggerFactory.getLogger(TripKnowledgeServiceImpl.class);
     
     private final TripKnowledgeServiceConfig config;
     
@@ -35,7 +33,7 @@ public class TripKnowledgeServiceImpl implements TripKnowledgeService {
     
     @Override
     public List<TripRoute> findSuitableRoutes(TravelDemand travelDemand, PersonalPreferences personalPreferences) {
-        logger.info("Finding suitable routes for travel demand: {} destinations, {} days", 
+        log.info("Finding suitable routes for travel demand: {} destinations, {} days", 
                    travelDemand.getMustGoDestinations().size(), travelDemand.getDays());
         
         // Validate input parameters
@@ -58,12 +56,16 @@ public class TripKnowledgeServiceImpl implements TripKnowledgeService {
             }
             
             // Mock implementation - return predefined routes
+            log.debug("Creating mock routes for knowledge base query");
             List<TripRoute> mockRoutes = createMockRoutes();
+            log.debug("Generated {} mock routes", mockRoutes.size());
             
             // Apply basic filtering based on travel demand
+            log.debug("Filtering routes by travel demand - max days: {}", travelDemand.getDays() + 2);
             List<TripRoute> filteredRoutes = mockRoutes.stream()
                 .filter(route -> route.getRecommendedDays() <= travelDemand.getDays() + 2) // Allow some flexibility
                 .collect(Collectors.toList());
+            log.debug("After day filtering: {} routes remain", filteredRoutes.size());
             
             // Further filter by preferences
             List<TripRoute> finalRoutes = filterRoutesByPreferences(filteredRoutes, personalPreferences);
@@ -75,30 +77,30 @@ public class TripKnowledgeServiceImpl implements TripKnowledgeService {
                 throw new NoRoutesFoundException(criteria);
             }
             
-            logger.info("Found {} suitable routes", finalRoutes.size());
+            log.info("Found {} suitable routes", finalRoutes.size());
             return finalRoutes;
             
         } catch (NoRoutesFoundException | ValidationException e) {
             throw e;
         } catch (ExternalServiceException e) {
-            logger.error("External service error: {}", e.getMessage());
+            log.error("External service error: {}", e.getMessage());
             throw e;
         } catch (Exception e) {
-            logger.error("Unexpected error finding suitable routes", e);
+            log.error("Unexpected error finding suitable routes", e);
             throw new ExternalServiceException("TripKnowledgeService", "Failed to find suitable routes", e);
         }
     }
     
     @Override
     public List<TripRoute> filterRoutesByPreferences(List<TripRoute> routes, PersonalPreferences personalPreferences) {
-        logger.info("Filtering {} routes by personal preferences", routes.size());
+        log.info("Filtering {} routes by personal preferences", routes.size());
         
         if (routes == null) {
             throw new ValidationException("Routes list cannot be null");
         }
         
         if (personalPreferences == null || personalPreferences.getHates() == null) {
-            logger.debug("No personal preferences to filter by, returning all routes");
+            log.debug("No personal preferences to filter by, returning all routes");
             return routes;
         }
         
@@ -113,11 +115,11 @@ public class TripKnowledgeServiceImpl implements TripKnowledgeService {
                 })
                 .collect(Collectors.toList());
             
-            logger.debug("Filtered {} routes to {} routes based on preferences", routes.size(), filteredRoutes.size());
+            log.debug("Filtered {} routes to {} routes based on preferences", routes.size(), filteredRoutes.size());
             return filteredRoutes;
             
         } catch (Exception e) {
-            logger.error("Error filtering routes by preferences", e);
+            log.error("Error filtering routes by preferences", e);
             throw new ExternalServiceException("TripKnowledgeService", "Failed to filter routes by preferences", e);
         }
     }
@@ -125,7 +127,7 @@ public class TripKnowledgeServiceImpl implements TripKnowledgeService {
     @Override
     public boolean isServiceHealthy() {
         // Mock implementation - always return true
-        logger.debug("Trip Knowledge Base service health check - returning true (mock)");
+        log.debug("Trip Knowledge Base service health check - returning true (mock)");
         return true;
     }
     
@@ -133,6 +135,7 @@ public class TripKnowledgeServiceImpl implements TripKnowledgeService {
      * Create mock trip routes for testing and development
      */
     private List<TripRoute> createMockRoutes() {
+        log.debug("Creating mock trip routes for knowledge base");
         List<TripRoute> routes = new ArrayList<>();
         
         // Route 1: Japan Cultural Tour

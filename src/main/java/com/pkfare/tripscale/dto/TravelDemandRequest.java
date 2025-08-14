@@ -1,12 +1,17 @@
 package com.pkfare.tripscale.dto;
 
 import jakarta.validation.constraints.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Request DTO for travel demand input
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class TravelDemandRequest {
     
     @NotEmpty(message = "Must-go destinations cannot be empty")
@@ -38,94 +43,4 @@ public class TravelDemandRequest {
     @Pattern(regexp = "^[a-zA-Z0-9\\-_]+$", message = "User ID contains invalid characters")
     @Size(min = 1, max = 50, message = "User ID must be between 1 and 50 characters")
     private String userId;
-    
-    public TravelDemandRequest() {}
-    
-    public TravelDemandRequest(List<String> mustGoDestinations, Integer days, Integer passenger,
-                              String passengerType, String budgets, String userId) {
-        this.mustGoDestinations = mustGoDestinations;
-        this.days = days;
-        this.passenger = passenger;
-        this.passengerType = passengerType;
-        this.budgets = budgets;
-        this.userId = userId;
-    }
-    
-    public List<String> getMustGoDestinations() {
-        return mustGoDestinations;
-    }
-    
-    public void setMustGoDestinations(List<String> mustGoDestinations) {
-        this.mustGoDestinations = mustGoDestinations;
-    }
-    
-    public Integer getDays() {
-        return days;
-    }
-    
-    public void setDays(Integer days) {
-        this.days = days;
-    }
-    
-    public Integer getPassenger() {
-        return passenger;
-    }
-    
-    public void setPassenger(Integer passenger) {
-        this.passenger = passenger;
-    }
-    
-    public String getPassengerType() {
-        return passengerType;
-    }
-    
-    public void setPassengerType(String passengerType) {
-        this.passengerType = passengerType;
-    }
-    
-    public String getBudgets() {
-        return budgets;
-    }
-    
-    public void setBudgets(String budgets) {
-        this.budgets = budgets;
-    }
-    
-    public String getUserId() {
-        return userId;
-    }
-    
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-    
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        TravelDemandRequest that = (TravelDemandRequest) o;
-        return Objects.equals(mustGoDestinations, that.mustGoDestinations) &&
-               Objects.equals(days, that.days) &&
-               Objects.equals(passenger, that.passenger) &&
-               Objects.equals(passengerType, that.passengerType) &&
-               Objects.equals(budgets, that.budgets) &&
-               Objects.equals(userId, that.userId);
-    }
-    
-    @Override
-    public int hashCode() {
-        return Objects.hash(mustGoDestinations, days, passenger, passengerType, budgets, userId);
-    }
-    
-    @Override
-    public String toString() {
-        return "TravelDemandRequest{" +
-               "mustGoDestinations=" + mustGoDestinations +
-               ", days=" + days +
-               ", passenger=" + passenger +
-               ", passengerType='" + passengerType + '\'' +
-               ", budgets='" + budgets + '\'' +
-               ", userId='" + userId + '\'' +
-               '}';
-    }
 }

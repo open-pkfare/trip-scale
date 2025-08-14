@@ -1,8 +1,7 @@
 package com.pkfare.tripscale.exception;
 
 import com.pkfare.tripscale.model.ErrorResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -21,10 +20,11 @@ import java.util.List;
  * Global exception handler that provides centralized exception handling
  * across all controllers in the application.
  */
+@Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
     
-    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     
     /**
      * Handle ResourceNotFoundException
@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleResourceNotFoundException(
             ResourceNotFoundException ex, WebRequest request) {
         
-        logger.warn("Resource not found: {}", ex.getMessage());
+        log.warn("Resource not found: {}", ex.getMessage());
         
         ErrorResponse errorResponse = new ErrorResponse(
             ex.getMessage(),
@@ -54,7 +54,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleValidationException(
             ValidationException ex, WebRequest request) {
         
-        logger.warn("Validation error: {}", ex.getMessage());
+        log.warn("Validation error: {}", ex.getMessage());
         
         ErrorResponse errorResponse = new ErrorResponse(
             ex.getMessage(),
@@ -74,7 +74,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(
             MethodArgumentNotValidException ex, WebRequest request) {
         
-        logger.warn("Method argument validation failed: {}", ex.getMessage());
+        log.warn("Method argument validation failed: {}", ex.getMessage());
         
         List<String> details = new ArrayList<>();
         for (FieldError error : ex.getBindingResult().getFieldErrors()) {
@@ -100,7 +100,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleConstraintViolationException(
             ConstraintViolationException ex, WebRequest request) {
         
-        logger.warn("Constraint violation: {}", ex.getMessage());
+        log.warn("Constraint violation: {}", ex.getMessage());
         
         List<String> details = new ArrayList<>();
         for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
@@ -126,7 +126,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleTravelServiceException(
             TravelServiceException ex, WebRequest request) {
         
-        logger.warn("Travel service exception: {}", ex.getMessage());
+        log.warn("Travel service exception: {}", ex.getMessage());
         
         ErrorResponse errorResponse = new ErrorResponse(
             ex.getMessage(),
@@ -146,7 +146,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleExternalServiceException(
             ExternalServiceException ex, WebRequest request) {
         
-        logger.error("External service exception: {}", ex.getMessage(), ex);
+        log.error("External service exception: {}", ex.getMessage(), ex);
         
         String message = String.format("%s. Please try again later or contact support if the problem persists.", ex.getMessage());
         
@@ -168,7 +168,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleUserNotFoundException(
             UserNotFoundException ex, WebRequest request) {
         
-        logger.warn("User not found: {}", ex.getMessage());
+        log.warn("User not found: {}", ex.getMessage());
         
         String message = ex.getMessage() + ". Please verify the user ID and try again.";
         
@@ -190,7 +190,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleNoRoutesFoundException(
             NoRoutesFoundException ex, WebRequest request) {
         
-        logger.info("No routes found: {}", ex.getMessage());
+        log.info("No routes found: {}", ex.getMessage());
         
         String message = ex.getMessage() + ". Try adjusting your search criteria or preferences.";
         
@@ -212,7 +212,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleRateLimitExceededException(
             RateLimitExceededException ex, WebRequest request) {
         
-        logger.warn("Rate limit exceeded for service '{}' and user '{}': {}", 
+        log.warn("Rate limit exceeded for service '{}' and user '{}': {}", 
                    ex.getService(), ex.getUserId(), ex.getMessage());
         
         ErrorResponse errorResponse = new ErrorResponse(
@@ -238,7 +238,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleBusinessException(
             BusinessException ex, WebRequest request) {
         
-        logger.warn("Business exception: {}", ex.getMessage());
+        log.warn("Business exception: {}", ex.getMessage());
         
         ErrorResponse errorResponse = new ErrorResponse(
             ex.getMessage(),
@@ -258,7 +258,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleMethodNotSupportedException(
             HttpRequestMethodNotSupportedException ex, WebRequest request) {
         
-        logger.warn("Method not supported: {}", ex.getMessage());
+        log.warn("Method not supported: {}", ex.getMessage());
         
         String message = String.format("HTTP method '%s' is not supported for this endpoint", ex.getMethod());
         
@@ -280,7 +280,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleGenericException(
             Exception ex, WebRequest request) {
         
-        logger.error("Unexpected error occurred: {}", ex.getMessage(), ex);
+        log.error("Unexpected error occurred: {}", ex.getMessage(), ex);
         
         ErrorResponse errorResponse = new ErrorResponse(
             "An unexpected error occurred. Please try again later.",

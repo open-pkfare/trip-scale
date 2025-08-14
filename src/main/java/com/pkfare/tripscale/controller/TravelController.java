@@ -8,6 +8,7 @@ import com.pkfare.tripscale.dto.TravelDetailsRequest;
 import com.pkfare.tripscale.dto.TripRoutesResponse;
 import com.pkfare.tripscale.service.TravelService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,12 +23,13 @@ import java.util.Map;
  * REST controller for travel route guidance endpoints.
  * Handles both direct destination input and AI-guided discovery workflows.
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/travel")
 @CrossOrigin(origins = "*")
 public class TravelController {
     
-    private static final Logger logger = LoggerFactory.getLogger(TravelController.class);
+
     
     private final TravelService travelService;
     
@@ -44,15 +46,15 @@ public class TravelController {
      */
     @PostMapping("/direct-input")
     public ResponseEntity<TripRoutesResponse> directInput(@Valid @RequestBody TravelDemandRequest request) {
-        logger.info("Processing direct input request for user: {}", request.getUserId());
+        log.info("Processing direct input request for user: {}", request.getUserId());
         
         try {
             TripRoutesResponse response = travelService.processDirectInput(request);
-            logger.info("Successfully processed direct input for user: {}, found {} routes", 
+            log.info("Successfully processed direct input for user: {}, found {} routes", 
                        request.getUserId(), response.getRoutes().size());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            logger.error("Error processing direct input for user: {}", request.getUserId(), e);
+            log.error("Error processing direct input for user: {}", request.getUserId(), e);
             throw e;
         }
     }
@@ -65,15 +67,15 @@ public class TravelController {
      */
     @PostMapping("/guess-me")
     public ResponseEntity<GuessMeResponse> guessMe(@Valid @RequestBody GuessMeRequest request) {
-        logger.info("Initiating GuessMe for user: {}", request.getUserId());
+        log.info("Initiating GuessMe for user: {}", request.getUserId());
         
         try {
             GuessMeResponse response = travelService.initiateGuessMe(request);
-            logger.info("Successfully initiated GuessMe for user: {}, session: {}, suggestions: {}", 
+            log.info("Successfully initiated GuessMe for user: {}, session: {}, suggestions: {}", 
                        request.getUserId(), response.getSessionId(), response.getSuggestions().size());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            logger.error("Error initiating GuessMe for user: {}", request.getUserId(), e);
+            log.error("Error initiating GuessMe for user: {}", request.getUserId(), e);
             throw e;
         }
     }
@@ -86,7 +88,7 @@ public class TravelController {
      */
     @PostMapping("/confirm-destination")
     public ResponseEntity<Map<String, String>> confirmDestination(@Valid @RequestBody DestinationConfirmationRequest request) {
-        logger.info("Processing destination confirmation for session: {}, destination: {}, confirmed: {}", 
+        log.info("Processing destination confirmation for session: {}, destination: {}, confirmed: {}", 
                    request.getSessionId(), request.getDestination(), request.isConfirmed());
         
         try {
@@ -99,10 +101,10 @@ public class TravelController {
                 "Destination confirmed. Please provide travel details." : 
                 "Destination rejected. Please try again.");
             
-            logger.info("Successfully processed destination confirmation for session: {}", sessionId);
+            log.info("Successfully processed destination confirmation for session: {}", sessionId);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            logger.error("Error confirming destination for session: {}", request.getSessionId(), e);
+            log.error("Error confirming destination for session: {}", request.getSessionId(), e);
             throw e;
         }
     }
@@ -115,15 +117,15 @@ public class TravelController {
      */
     @PostMapping("/collect-details")
     public ResponseEntity<TripRoutesResponse> collectDetails(@Valid @RequestBody TravelDetailsRequest request) {
-        logger.info("Collecting travel details for session: {}", request.getSessionId());
+        log.info("Collecting travel details for session: {}", request.getSessionId());
         
         try {
             TripRoutesResponse response = travelService.collectTravelDetails(request);
-            logger.info("Successfully collected travel details for session: {}, found {} routes", 
+            log.info("Successfully collected travel details for session: {}, found {} routes", 
                        request.getSessionId(), response.getRoutes().size());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            logger.error("Error collecting travel details for session: {}", request.getSessionId(), e);
+            log.error("Error collecting travel details for session: {}", request.getSessionId(), e);
             throw e;
         }
     }
@@ -136,15 +138,15 @@ public class TravelController {
      */
     @GetMapping("/routes/{sessionId}")
     public ResponseEntity<TripRoutesResponse> getTripRoutes(@PathVariable String sessionId) {
-        logger.info("Retrieving trip routes for session: {}", sessionId);
+        log.info("Retrieving trip routes for session: {}", sessionId);
         
         try {
             TripRoutesResponse response = travelService.getTripRoutes(sessionId);
-            logger.info("Successfully retrieved trip routes for session: {}, found {} routes", 
+            log.info("Successfully retrieved trip routes for session: {}, found {} routes", 
                        sessionId, response.getRoutes().size());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            logger.error("Error retrieving trip routes for session: {}", sessionId, e);
+            log.error("Error retrieving trip routes for session: {}", sessionId, e);
             throw e;
         }
     }

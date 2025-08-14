@@ -3,11 +3,16 @@ package com.pkfare.tripscale.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import java.util.Objects;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 /**
  * Request DTO for destination confirmation
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class DestinationConfirmationRequest {
     
     @NotBlank(message = "Session ID is required")
@@ -21,60 +26,4 @@ public class DestinationConfirmationRequest {
     private String destination;
     
     private boolean confirmed;
-    
-    public DestinationConfirmationRequest() {}
-    
-    public DestinationConfirmationRequest(String sessionId, String destination, boolean confirmed) {
-        this.sessionId = sessionId;
-        this.destination = destination;
-        this.confirmed = confirmed;
-    }
-    
-    public String getSessionId() {
-        return sessionId;
-    }
-    
-    public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
-    }
-    
-    public String getDestination() {
-        return destination;
-    }
-    
-    public void setDestination(String destination) {
-        this.destination = destination;
-    }
-    
-    public boolean isConfirmed() {
-        return confirmed;
-    }
-    
-    public void setConfirmed(boolean confirmed) {
-        this.confirmed = confirmed;
-    }
-    
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        DestinationConfirmationRequest that = (DestinationConfirmationRequest) o;
-        return confirmed == that.confirmed &&
-               Objects.equals(sessionId, that.sessionId) &&
-               Objects.equals(destination, that.destination);
-    }
-    
-    @Override
-    public int hashCode() {
-        return Objects.hash(sessionId, destination, confirmed);
-    }
-    
-    @Override
-    public String toString() {
-        return "DestinationConfirmationRequest{" +
-               "sessionId='" + sessionId + '\'' +
-               ", destination='" + destination + '\'' +
-               ", confirmed=" + confirmed +
-               '}';
-    }
 }
