@@ -24,7 +24,7 @@ public class DestinationRecommendationServiceImpl implements DestinationRecommen
 
   private final MockDestinationConfig mockDestinationConfig;
 
-  @Value("${mcp.server.max-suggestions:10}")
+  @Value("${mcp.server.max-suggestions:3}")
   private int maxSuggestions;
 
   @Autowired

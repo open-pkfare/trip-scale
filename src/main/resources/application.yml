@@ -10,7 +10,7 @@ spring:
     mcp:
       server:
         enabled: true
-        port: 8803
+        port: 8802
         name: "tripscale-mcp-server"
         description: "TripScale relevant MCP server"
 
