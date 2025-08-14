@@ -1,6 +1,6 @@
-package com.example.framework.exception;
+package com.pkfare.tripscale.exception;
 
-import com.example.framework.model.ErrorResponse;
+import com.pkfare.tripscale.model.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

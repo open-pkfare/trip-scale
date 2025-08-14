@@ -1,4 +1,4 @@
-package com.example.framework.config;
+package com.pkfare.tripscale.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;

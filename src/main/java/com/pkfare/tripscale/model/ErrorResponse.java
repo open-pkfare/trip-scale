@@ -1,4 +1,4 @@
-package com.example.framework.model;
+package com.pkfare.tripscale.model;
 
 import java.time.LocalDateTime;
 
