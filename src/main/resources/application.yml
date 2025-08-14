@@ -42,6 +42,17 @@ external:
     max-retries: 3
     retry-delay-ms: 1000
 
+# MCP server configuration
+mcp:
+  server:
+    name: ${MCP_SERVER_NAME:tripscale-destination-recommendations}
+    version: ${MCP_SERVER_VERSION:1.0.0}
+    description: ${MCP_SERVER_DESCRIPTION:TripScale destination recommendation MCP service}
+    enabled: ${MCP_SERVER_ENABLED:true}
+    max-suggestions: ${MCP_MAX_SUGGESTIONS:10}
+    request-timeout-seconds: ${MCP_REQUEST_TIMEOUT:30}
+    logging-enabled: ${MCP_LOGGING_ENABLED:true}
+
 # Mock data configuration for MemoryService
 mock:
   memory:
@@ -73,3 +84,35 @@ mock:
         - "Very expensive restaurants"
         - "Rainy weather destinations"
       age: 28
+  destinations:
+    suggestions:
+      - destination: "Vietnam, Hanoi"
+        reason: "Perfect blend of culture and cuisine with affordable prices"
+        confidence: 0.85
+      - destination: "Japan, Kyoto"
+        reason: "Rich cultural heritage and beautiful temples"
+        confidence: 0.92
+      - destination: "Thailand, Chiang Mai"
+        reason: "Authentic local experiences and great food scene"
+        confidence: 0.78
+      - destination: "Portugal, Porto"
+        reason: "Charming architecture and excellent wine culture"
+        confidence: 0.81
+      - destination: "South Korea, Busan"
+        reason: "Coastal beauty with modern city amenities"
+        confidence: 0.76
+      - destination: "Taiwan, Taipei"
+        reason: "Night markets and incredible street food"
+        confidence: 0.83
+      - destination: "Greece, Santorini"
+        reason: "Stunning sunsets and Mediterranean charm"
+        confidence: 0.89
+      - destination: "Morocco, Marrakech"
+        reason: "Exotic culture and vibrant markets"
+        confidence: 0.74
+      - destination: "Nepal, Kathmandu"
+        reason: "Gateway to Himalayas with rich spiritual culture"
+        confidence: 0.72
+      - destination: "Peru, Cusco"
+        reason: "Ancient Incan history and gateway to Machu Picchu"
+        confidence: 0.87
